@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name        Select text inside a link like Opera
 // @namespace   eight04.blogspot.com
-// @description Disable link draging and select text.
+// @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     3.1
+// @version     4.0
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -34,7 +34,7 @@ var force = {
 		
 			if (!this.target) {
 				return;
-			} 
+			}
 
 			if (this.select.toString()) {
 				this.preventClick = true;
