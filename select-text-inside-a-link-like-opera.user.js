@@ -77,8 +77,6 @@ var force = {
 				return;
 			}
 			
-			// console.log(this.currentPos.x - e.pageX, this.currentPos.y - e.pageY)
-			
 			if (Math.abs(e.pageX - this.currentPos.x) <= Math.abs(e.pageY - this.currentPos.y)) {
 				return;
 			}
