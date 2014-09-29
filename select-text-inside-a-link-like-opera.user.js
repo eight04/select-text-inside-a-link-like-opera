@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0
+// @version     4.0.1
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
