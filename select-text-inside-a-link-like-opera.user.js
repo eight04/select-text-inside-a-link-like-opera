@@ -51,7 +51,7 @@ var force = {
 				return;
 			}
 
-			var caretPos = document.caretPositionFromPoint(this.currentPos.x, this.currentPos.y);
+			var caretPos = document.caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
 			if (!this.multiSelect) {
 				this.select.extend(caretPos.offsetNode, caretPos.offset);
 			} else {
@@ -82,18 +82,18 @@ var force = {
 			}
 			
 			e.preventDefault();
-			this.init(e, a);
+			this.target = a;
+			this.init(e);
 		}
 	},
-	init: function(e, a){
+	init: function(e){
 	
-		this.target = a;
 		this.startPos.x = e.pageX;
 		this.startPos.y = e.pageY;
 		
 		this.multiSelect = e.ctrlKey;
 		
-		var caretPos = document.caretPositionFromPoint(this.startPos.x, this.startPos.y);
+		var caretPos = document.caretPositionFromPoint(this.startPos.x - window.scrollX, this.startPos.y - window.scrollY);
 		if (!this.multiSelect) {
 			this.select.collapse(caretPos.offsetNode, caretPos.offset);
 		} else {
