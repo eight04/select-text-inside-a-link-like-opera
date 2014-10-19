@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.2
+// @version     4.0.3
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -12,7 +12,6 @@
 var force = {
 	target: null,
 	select: getSelection(),
-	preventClick: false,
 	currentPos: {
 		x: null,
 		y: null
@@ -22,35 +21,50 @@ var force = {
 		y: null
 	},
 	handleEvent: function(e){
+	
 		if (e.type == "click") {
 		
-			if (this.preventClick || !this.select.isCollapsed) {
+			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
+				return;
+			}
+			
+			if (!this.select.isCollapsed) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.preventClick = false;
+			}
+			
+		} else if (e.type == "mousedown") {
+			
+			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
+				return;
+			}
+			
+			if (!this.select.isCollapsed) {
+				var caretPos = document.caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
+				this.select.collapse(caretPos.offsetNode, caretPos.offset);
 			}
 			
 		} else if (e.type == "mouseup") {
+		
+			this.checkMove = false;
 		
 			if (!this.target) {
 				return;
 			}
 
-			if (this.select.toString()) {
-				this.preventClick = true;
-			}
-			
 			this.uninit();
 			
 		} else if (e.type == "mousemove") {
-			
+
+			this.moveX = e.pageX - this.currentPos.x;
+			this.moveY = e.pageY - this.currentPos.y;
 			this.currentPos.x = e.pageX;
 			this.currentPos.y = e.pageY;
 			
 			if (!this.target) {
 				return;
 			}
-
+			
 			var caretPos = document.caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
 			if (!this.multiSelect) {
 				this.select.extend(caretPos.offsetNode, caretPos.offset);
@@ -77,7 +91,14 @@ var force = {
 				return;
 			}
 			
-			if (Math.abs(e.pageX - this.currentPos.x) <= Math.abs(e.pageY - this.currentPos.y)) {
+			var movementX = e.pageX - this.currentPos.x;
+			var movementY = e.pageY - this.currentPos.y;
+			
+			if (!movementX && !movementY) {
+				movementX = this.moveX;
+				movementY = this.moveY;
+			}
+			if (Math.abs(movementX) < Math.abs(movementY)) {
 				return;
 			}
 			
@@ -118,8 +139,11 @@ var force = {
 
 document.addEventListener("mousemove", force, false);
 document.addEventListener("mouseup", force, false);
+document.addEventListener("mousedown", force, false);
 document.addEventListener("click", force, true);
 document.addEventListener("dragstart", force, true);
+document.addEventListener("dragend", force, true);
+document.addEventListener("drag", force, true);
 document.addEventListener("DOMContentLoaded", function(){
 	GM_addStyle(".force-select{ -moz-user-select: text!important; }");
 }, false);

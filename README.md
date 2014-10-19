@@ -12,6 +12,9 @@ With this script, Firefox can select text inside a link instead of dragging them
 
 Changelog
 ---------
+* Version 4.0.3 (Oct 19, 2014)
+	- Cleanup some old code.
+	- Add a new method to detect dragging direction.
 * Version 4.0.2 (Oct 19, 2014)
 	- Fix: Prevent click event when selecting.
 * Version 4.0.1
