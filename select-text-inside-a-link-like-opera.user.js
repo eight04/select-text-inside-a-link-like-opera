@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.1
+// @version     4.0.2
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -24,7 +24,7 @@ var force = {
 	handleEvent: function(e){
 		if (e.type == "click") {
 		
-			if (this.preventClick) {
+			if (this.preventClick || !this.select.isCollapsed) {
 				e.preventDefault();
 				e.stopPropagation();
 				this.preventClick = false;
