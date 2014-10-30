@@ -4,10 +4,21 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.3
+// @version     4.0.4
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
+
+function inSelect(caretPos, selection){
+	var i, len = selection.rangeCount, range;
+	for (i = 0; i < len; i++) {
+		range = selection.getRangeAt(i);
+		if (range.isPointInRange(caretPos.offsetNode, caretPos.offset)) {
+			return true;
+		}
+	}
+	return false;
+}
 
 var force = {
 	target: null,
@@ -41,7 +52,9 @@ var force = {
 			
 			if (!this.select.isCollapsed) {
 				var caretPos = document.caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
-				this.select.collapse(caretPos.offsetNode, caretPos.offset);
+				if (!inSelect(caretPos, this.select)) {
+					this.select.collapse(caretPos.offsetNode, caretPos.offset);
+				}
 			}
 			
 		} else if (e.type == "mouseup") {
