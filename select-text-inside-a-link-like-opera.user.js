@@ -4,10 +4,12 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.4
+// @version     4.0.5
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
+
+"use strict";
 
 function inSelect(caretPos, selection){
 	var i, len = selection.rangeCount, range;
@@ -32,81 +34,91 @@ var force = {
 		y: null
 	},
 	handleEvent: function(e){
-	
+		var caretPos, a, movementX, movementY;
+
 		if (e.type == "click") {
-		
+
 			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
 				return;
 			}
-			
+
 			if (!this.select.isCollapsed) {
 				e.preventDefault();
 				e.stopPropagation();
 			}
-			
+
 		} else if (e.type == "mousedown") {
-			
+//			console.log(e);
+
+			if (e.target.nodeName == "IMG") {
+				this.imgFlag = true;
+			}
+
 			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
 				return;
 			}
-			
+
 			if (!this.select.isCollapsed) {
-				var caretPos = document.caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
+				caretPos = document.caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
 				if (!inSelect(caretPos, this.select)) {
 					this.select.collapse(caretPos.offsetNode, caretPos.offset);
 				}
 			}
-			
+
 		} else if (e.type == "mouseup") {
-		
+
+//			console.log(e);
 			this.checkMove = false;
-		
+			this.imgFlag = false;
+
 			if (!this.target) {
 				return;
 			}
 
 			this.uninit();
-			
+
 		} else if (e.type == "mousemove") {
 
 			this.moveX = e.pageX - this.currentPos.x;
 			this.moveY = e.pageY - this.currentPos.y;
 			this.currentPos.x = e.pageX;
 			this.currentPos.y = e.pageY;
-			
+
 			if (!this.target) {
 				return;
 			}
-			
-			var caretPos = document.caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
+
+			caretPos = document.caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
 			if (!this.multiSelect) {
 				this.select.extend(caretPos.offsetNode, caretPos.offset);
 			} else {
 				this.range.setEnd(caretPos.offsetNode, caretPos.offset);
 			}
-			
+
 		} else if (e.type == "dragstart") {
-		
+
 			if (e.button || e.altKey || e.shiftKey) {
 				return;
 			}
-			
-			if (e.target.nodeName == "IMG") {
+
+//			console.log(e);
+			if (this.imgFlag) {
+				this.imgFlag = false;
 				return;
 			}
-			
-			var a = e.target;
+
+			a = e.target;
 			while (a.nodeName != "A" && a.nodeName != "HTML") {
 				a = a.parentNode;
 			}
-			
+
 			if (!a.href) {
 				return;
 			}
-			
-			var movementX = e.pageX - this.currentPos.x;
-			var movementY = e.pageY - this.currentPos.y;
-			
+
+			movementX = e.pageX - this.currentPos.x;
+			movementY = e.pageY - this.currentPos.y;
+
 			if (!movementX && !movementY) {
 				movementX = this.moveX;
 				movementY = this.moveY;
@@ -114,19 +126,19 @@ var force = {
 			if (Math.abs(movementX) < Math.abs(movementY)) {
 				return;
 			}
-			
+
 			e.preventDefault();
 			this.target = a;
 			this.init(e);
 		}
 	},
 	init: function(e){
-	
+
 		this.startPos.x = e.pageX;
 		this.startPos.y = e.pageY;
-		
+
 		this.multiSelect = e.ctrlKey;
-		
+
 		var caretPos = document.caretPositionFromPoint(this.startPos.x - window.scrollX, this.startPos.y - window.scrollY);
 		if (!this.multiSelect) {
 			this.select.collapse(caretPos.offsetNode, caretPos.offset);
@@ -136,17 +148,17 @@ var force = {
 			this.range.collapse();
 			this.select.addRange(this.range);
 		}
-		
+
 		this.target.classList.add("force-select");
-		
+
 	},
 	uninit: function(){
-	
+
 		this.target.classList.remove("force-select");
 		this.target = null;
 		this.range = null;
 		this.multiSelect = false;
-		
+
 	}
 };
 

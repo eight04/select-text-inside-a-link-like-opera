@@ -1,6 +1,7 @@
 {
 	"env": {
-		"browser": true
+		"browser": true,
+		"node": true
 	},
 	"rules": {
 		"eqeqeq": 0,
@@ -12,13 +13,15 @@
 		"new-cap": 0,
 		"no-global-strict": 0,
 		"no-multi-str": 0,
-		"no-inner-declarations": [2, "both"]
+		"no-inner-declarations": [2, "both"],
+		"global-strict": 0
 	},
 	"globals": {
 		"GM_addStyle": false,
 		"console": false,
 		"marked": false,
 		"$": false,
-		"GM_xmlhttpRequest": false
+		"GM_xmlhttpRequest": false,
+		"Range": false
 	}
 }
