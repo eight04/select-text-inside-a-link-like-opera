@@ -12,7 +12,9 @@ With this script, Firefox can select text inside a link instead of dragging them
 
 Changelog
 ---------
-* Versopm 4.0.5 (Nov 11, 2014)
+* Version 4.0.6 (Nov 12, 2014)
+	- Fix: Unable to click links after selecting.
+* Version 4.0.5 (Nov 11, 2014)
 	- Fix: Unable to drag image.
 * Version 4.0.4 (Oct 30, 2014)
 	- Fix: Unable to drag selected text.

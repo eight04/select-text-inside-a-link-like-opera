@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.5
+// @version     4.0.6
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -42,20 +42,21 @@ var force = {
 				return;
 			}
 
-			if (!this.select.isCollapsed) {
+			if (this.uninitFlag) {
 				e.preventDefault();
-				e.stopPropagation();
+				e.stopImmediatePropagation();
 			}
 
 		} else if (e.type == "mousedown") {
-//			console.log(e);
-
-			if (e.target.nodeName == "IMG") {
-				this.imgFlag = true;
-			}
 
 			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
 				return;
+			}
+
+			this.uninitFlag = false;
+
+			if (e.target.nodeName == "IMG") {
+				this.imgFlag = true;
 			}
 
 			if (!this.select.isCollapsed) {
@@ -67,7 +68,6 @@ var force = {
 
 		} else if (e.type == "mouseup") {
 
-//			console.log(e);
 			this.checkMove = false;
 			this.imgFlag = false;
 
@@ -75,6 +75,7 @@ var force = {
 				return;
 			}
 
+			this.uninitFlag = true;
 			this.uninit();
 
 		} else if (e.type == "mousemove") {
@@ -101,7 +102,6 @@ var force = {
 				return;
 			}
 
-//			console.log(e);
 			if (this.imgFlag) {
 				this.imgFlag = false;
 				return;
