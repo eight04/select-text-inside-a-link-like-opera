@@ -14,6 +14,8 @@ Support Firefox and Chrome.
 
 Changelog
 ---------
+* Version 4.0.8 (Nov 17, 2014)
+	- Fix: No effect in firefox's responsive design viewer.
 * Version 4.0.7 (Nov 17, 2014)
 	- Support Chrome!
 * Version 4.0.6 (Nov 12, 2014)

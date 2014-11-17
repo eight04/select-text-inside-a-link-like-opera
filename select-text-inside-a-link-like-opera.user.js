@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.7
+// @version     4.0.8
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -45,7 +45,7 @@ var force = {
 		y: null
 	},
 	handleEvent: function(e){
-		var caretPos, a, movementX, movementY;
+		var caretPos, a, movementX, movementY, select;
 
 		if (e.type == "click") {
 
@@ -70,10 +70,11 @@ var force = {
 				this.imgFlag = true;
 			}
 
-			if (!this.select.isCollapsed) {
+			select = window.getSelection();
+			if (!select.isCollapsed) {
 				caretPos = caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
-				if (!inSelect(caretPos, this.select)) {
-					this.select.collapse(caretPos.offsetNode, caretPos.offset);
+				if (!inSelect(caretPos, select)) {
+					select.collapse(caretPos.offsetNode, caretPos.offset);
 				}
 			}
 
@@ -100,9 +101,10 @@ var force = {
 				return;
 			}
 
+			select = window.getSelection();
 			caretPos = caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
 			if (!this.multiSelect) {
-				this.select.extend(caretPos.offsetNode, caretPos.offset);
+				select.extend(caretPos.offsetNode, caretPos.offset);
 			} else {
 				this.range.setEnd(caretPos.offsetNode, caretPos.offset);
 			}
@@ -144,6 +146,7 @@ var force = {
 		}
 	},
 	init: function(e){
+		var select = window.getSelection();
 
 		this.startPos.x = e.pageX;
 		this.startPos.y = e.pageY;
@@ -152,12 +155,12 @@ var force = {
 
 		var caretPos = caretPositionFromPoint(this.startPos.x - window.scrollX, this.startPos.y - window.scrollY);
 		if (!this.multiSelect) {
-			this.select.collapse(caretPos.offsetNode, caretPos.offset);
+			select.collapse(caretPos.offsetNode, caretPos.offset);
 		} else {
 			this.range = new Range();
 			this.range.setEnd(caretPos.offsetNode, caretPos.offset);
 			this.range.collapse();
-			this.select.addRange(this.range);
+			select.addRange(this.range);
 		}
 
 		this.target.classList.add("force-select");
