@@ -4,12 +4,23 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.6
+// @version     4.0.7
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
 
 "use strict";
+
+function caretPositionFromPoint(x, y) {
+	if (document.caretPositionFromPoint) {
+		return document.caretPositionFromPoint(x, y);
+	}
+	var r = document.caretRangeFromPoint(x, y);
+	return {
+		offsetNode: r.startContainer,
+		offset: r.startOffset
+	};
+}
 
 function inSelect(caretPos, selection){
 	var i, len = selection.rangeCount, range;
@@ -60,7 +71,7 @@ var force = {
 			}
 
 			if (!this.select.isCollapsed) {
-				caretPos = document.caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
+				caretPos = caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
 				if (!inSelect(caretPos, this.select)) {
 					this.select.collapse(caretPos.offsetNode, caretPos.offset);
 				}
@@ -89,7 +100,7 @@ var force = {
 				return;
 			}
 
-			caretPos = document.caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
+			caretPos = caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
 			if (!this.multiSelect) {
 				this.select.extend(caretPos.offsetNode, caretPos.offset);
 			} else {
@@ -139,7 +150,7 @@ var force = {
 
 		this.multiSelect = e.ctrlKey;
 
-		var caretPos = document.caretPositionFromPoint(this.startPos.x - window.scrollX, this.startPos.y - window.scrollY);
+		var caretPos = caretPositionFromPoint(this.startPos.x - window.scrollX, this.startPos.y - window.scrollY);
 		if (!this.multiSelect) {
 			this.select.collapse(caretPos.offsetNode, caretPos.offset);
 		} else {

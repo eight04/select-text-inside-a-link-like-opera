@@ -4,7 +4,9 @@ Disable link dragging and select text.
 
 Info
 ----
-With this script, Firefox can select text inside a link instead of dragging them around if the cursor moved horizontally.
+With this script, you can select text inside of a link instead of dragging them around if the cursor moved horizontally.
+
+Support Firefox and Chrome.
 
 ![](https://i.imgur.com/f7TgRur.png)
 ![](https://i.imgur.com/NSqXG5n.png)
@@ -12,6 +14,8 @@ With this script, Firefox can select text inside a link instead of dragging them
 
 Changelog
 ---------
+* Version 4.0.7 (Nov 17, 2014)
+	- Support Chrome!
 * Version 4.0.6 (Nov 12, 2014)
 	- Fix: Unable to click links after selecting.
 * Version 4.0.5 (Nov 11, 2014)
