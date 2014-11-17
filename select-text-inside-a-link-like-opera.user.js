@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.8
+// @version     4.0.9
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -44,6 +44,10 @@ var force = {
 		x: null,
 		y: null
 	},
+	lastMouseDownPos: {
+		x: null,
+		y: null
+	},
 	handleEvent: function(e){
 		var caretPos, a, movementX, movementY, select;
 
@@ -53,7 +57,11 @@ var force = {
 				return;
 			}
 
-			if (this.uninitFlag) {
+			if (
+				this.uninitFlag ||
+				e.pageX != this.lastMouseDownPos.x ||	// Fix Firefox clicking issue.
+				e.pageY != this.lastMouseDownPos.y
+			) {
 				e.preventDefault();
 				e.stopImmediatePropagation();
 			}
@@ -63,6 +71,11 @@ var force = {
 			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
 				return;
 			}
+
+			// Trak clicking to solve this:
+			// https://greasyfork.org/ru/forum/discussion/1898/doesn-t-work-on-some-sites
+			this.lastMouseDownPos.x = e.pageX;
+			this.lastMouseDownPos.y = e.pageY;
 
 			this.uninitFlag = false;
 
