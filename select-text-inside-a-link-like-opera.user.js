@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.9
+// @version     4.0.10
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -191,11 +191,9 @@ var force = {
 
 document.addEventListener("mousemove", force, false);
 document.addEventListener("mouseup", force, false);
-document.addEventListener("mousedown", force, false);
+document.addEventListener("mousedown", force, true);
 document.addEventListener("click", force, true);
 document.addEventListener("dragstart", force, true);
-document.addEventListener("dragend", force, true);
-document.addEventListener("drag", force, true);
 document.addEventListener("DOMContentLoaded", function(){
 	GM_addStyle(".force-select{ -moz-user-select: text!important; }");
 }, false);

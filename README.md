@@ -14,6 +14,8 @@ Support Firefox and Chrome.
 
 Changelog
 ---------
+* Version 4.0.10 (Nov 17, 2014)
+	- Fix: DeviantArt issue. Use capture on "mousedown".
 * Version 4.0.9 (Nov 17, 2014)
 	- Fix: Firefox clicking issue. (This might break some sites!)
 * Version 4.0.8 (Nov 17, 2014)
