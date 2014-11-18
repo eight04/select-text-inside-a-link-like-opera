@@ -4,9 +4,24 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 	<script src="select-text-inside-a-link-like-opera.user.js"></script>
+	<script src='https://code.jquery.com/jquery-1.11.1.js'></script>
 </head>
 <body>
 	<a href="http://google.com">http://google.com</a>
 	wat
+	<form action="?">
+		<input type="text">
+		<button type="submit">Submit</button>
+	</form>
+
+	<script>
+		$("button").click(function(e){
+			console.log(e);
+		});
+		$("form").submit(function(e){
+			console.log(e);
+			e.preventDefault();
+		});
+	</script>
 </body>
 </html>
