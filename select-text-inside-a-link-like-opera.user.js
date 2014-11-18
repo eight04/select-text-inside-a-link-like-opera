@@ -4,7 +4,7 @@
 // @description Disable link dragging and select text.
 // @include     http://*
 // @include     https://*
-// @version     4.0.10
+// @version     4.0.11
 // @grant		GM_addStyle
 // @run-at      document-start
 // ==/UserScript==
@@ -57,11 +57,8 @@ var force = {
 				return;
 			}
 
-			if (
-				this.uninitFlag ||
-				e.pageX != this.lastMouseDownPos.x ||	// Fix Firefox clicking issue.
-				e.pageY != this.lastMouseDownPos.y
-			) {
+			// Fix browser clicking issue.
+			if (this.uninitFlag || e.pageX && e.pageY && (e.pageX != this.lastMouseDownPos.x || e.pageY != this.lastMouseDownPos.y)) {
 				e.preventDefault();
 				e.stopImmediatePropagation();
 			}
