@@ -14,6 +14,8 @@ Support Firefox and Chrome.
 
 Changelog
 ---------
+* Version 4.0.12 (Nov 18, 2014)
+	- Enhance: Only prevent click if text is selected.
 * Version 4.0.11 (Nov 18, 2014)
 	- Fix: Form button issue.
 * Version 4.0.10 (Nov 17, 2014)
