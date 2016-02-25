@@ -11,6 +11,10 @@ Support Firefox and Chrome. For chrome users, I recommend [this script][https://
 ![](https://i.imgur.com/f7TgRur.png)
 ![](https://i.imgur.com/NSqXG5n.png)
 
+Install
+-------
+[Greasy Fork](https://greasyfork.org/en/scripts/789-select-text-inside-a-link-like-opera)
+
 
 Changelog
 ---------
