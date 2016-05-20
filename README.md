@@ -6,7 +6,7 @@ Info
 ----
 With this script, you can select text inside of a link instead of dragging them around if the cursor moved horizontally.
 
-Support Firefox and Chrome. For chrome users, I recommend [this script][https://gist.github.com/Griever/5005165].
+Support Firefox and Chrome. For chrome users, I recommend [this script](https://gist.github.com/Griever/5005165).
 
 ![](https://i.imgur.com/f7TgRur.png)
 ![](https://i.imgur.com/NSqXG5n.png)
