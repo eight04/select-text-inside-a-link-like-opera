@@ -1,15 +1,16 @@
 // ==UserScript==
-// @name        Select text inside a link like Opera
-// @namespace   eight04.blogspot.com
+// @name Select text inside a link like Opera
+// @version 4.0.12
 // @description Disable link dragging and select text.
-// @include     http://*
-// @include     https://*
-// @version     4.0.12
-// @grant		GM_addStyle
-// @run-at      document-start
+// @homepageURL https://github.com/eight04/select-text-inside-a-link-like-opera#readme
+// @supportURL https://github.com/eight04/select-text-inside-a-link-like-opera/issues
+// @license MIT
+// @author eight <eight04@gmail.com> (http://eight04.blogspot.tw)
+// @namespace eight04.blogspot.com
+// @include *
+// @grant GM_addStyle
+// @run-at document-start
 // ==/UserScript==
-
-"use strict";
 
 function caretPositionFromPoint(x, y) {
 	if (document.caretPositionFromPoint) {
