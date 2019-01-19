@@ -3,5 +3,8 @@ module.exports = {
 		"browser": true,
 		greasemonkey: true
 	},
-  extends: ["eslint:recommended"]
+  extends: ["eslint:recommended"],
+  parserOptions: {
+    ecmaVersion: 2018
+  }
 };

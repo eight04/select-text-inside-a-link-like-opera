@@ -12,6 +12,121 @@
 // @run-at document-start
 // ==/UserScript==
 
+const IS_FIREFOX = typeof InstallTrigger !== 'undefined';
+const movementTracker = IS_FIREFOX && createMovementTracker();
+
+document.addEventListener("mousedown", e => {
+  // only Firefox supports multiple range?
+  if (e.shiftKey || e.altKey || e.button || e.ctrlKey && !IS_FIREFOX) {
+    return;
+  }
+  if (e.target.nodeName === "IMG") {
+    return;
+  }
+  const target = findLinkTarget(e.target);
+  if (!target || !target.href) {
+    return;
+  }
+  const initX = e.pageX;
+  const initY = e.pageY;
+  let posX = initX;
+  let posY = initY;
+  let selection;
+  
+  const events = {
+    mousemove: e => {
+      posX = e.pageX;
+      posY = e.pageY;
+			if (!selection) {
+				return;
+			}
+			const caretPos = caretPositionFromPoint(
+        posX - window.scrollX,
+        posY - window.scrollY
+      );
+      selection.extend(caretPos.offsetNode, caretPos.offset);
+    },
+    mouseup: () => {
+      // delay uninit to cancel click event
+      setTimeout(uninit);
+    },
+    click: e => {
+			if (!selection) {
+        return;
+      }
+			// fix browser clicking issue. Cancel click event if we have selected
+      // something.
+      const clickedTarget = findLinkTarget(e.target);
+      if (clickedTarget === target) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    },
+    dragstart: e => {
+      const delta = movementTracker || {deltaX: posX - initX, deltaY: posY - initY};
+			if (Math.abs(delta.deltaX) < Math.abs(delta.deltaY)) {
+        uninit();
+				return;
+			}
+      selection = window.getSelection();
+      const caretPos = caretPositionFromPoint(initX - window.scrollX, initY - window.scrollY);
+      if (!selection.isCollapsed && inSelect(caretPos, selection)) {
+        uninit();
+        return;
+      }
+      if (!e.ctrlKey) {
+        selection.collapse(caretPos.offsetNode, caretPos.offset);
+      } else {
+        const range = new Range;
+        range.setStart(caretPos.offsetNode, caretPos.offset);
+        selection.addRange(range);
+      }
+      target.classList.add("select-text-inside-a-link");
+			e.preventDefault();      
+    }
+  };
+  
+  for (const key of Object.keys(events)) {
+    document.addEventListener(key, events[key], true);
+  }
+  
+  function uninit() {
+    target.classList.remove("select-text-inside-a-link");
+    for (const key of Object.keys(events)) {
+      document.removeEventListener(key, events[key], true);
+    }    
+  }
+}, true);
+
+document.addEventListener("DOMContentLoaded", function(){
+	GM_addStyle(".select-text-inside-a-link{ -moz-user-select: text!important; }");
+});
+
+function createMovementTracker() {
+  // we always have to track mouse movement so we can use the delta in dragstart
+  // event.
+  // it is possible to calculate the movement between mousedown and dragstart
+  // events in Chrome. In Firefox, the two events are fired in the same time.
+  const tracker = {
+    posX: 0,
+    posY: 0,
+    deltaX: 0,
+    deltaY: 0
+  };
+  document.addEventListener("mousemove", onMouseMove);
+  return tracker;
+  
+  function onMouseMove(e) {
+    if (Math.abs(e.pageX - tracker.posX) < 5 && Math.abs(e.pageY - tracker.posY) < 5) {
+      return;
+    }
+    tracker.deltaX = e.pageX - tracker.posX;
+    tracker.deltaY = e.pageY - tracker.posY;
+    tracker.posX = e.pageX;
+    tracker.posY = e.pageY;
+  }
+}
+
 function caretPositionFromPoint(x, y) {
 	if (document.caretPositionFromPoint) {
 		return document.caretPositionFromPoint(x, y);
@@ -34,165 +149,9 @@ function inSelect(caretPos, selection){
 	return false;
 }
 
-var force = {
-	target: null,
-	select: getSelection(),
-	currentPos: {
-		x: null,
-		y: null
-	},
-	startPos: {
-		x: null,
-		y: null
-	},
-	lastMouseDownPos: {
-		x: null,
-		y: null
-	},
-	handleEvent: function(e){
-		var caretPos, a, movementX, movementY, select;
-
-		if (e.type == "click") {
-
-			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
-				return;
-			}
-
-			// Fix browser clicking issue.
-			select = window.getSelection();
-			if (this.uninitFlag || !select.isCollapsed && e.pageX && e.pageY && (e.pageX != this.lastMouseDownPos.x || e.pageY != this.lastMouseDownPos.y)) {
-				e.preventDefault();
-				e.stopImmediatePropagation();
-			}
-
-		} else if (e.type == "mousedown") {
-
-			if (e.ctrlKey || e.shiftKey || e.altKey || e.button) {
-				return;
-			}
-
-			// Trak clicking to solve this:
-			// https://greasyfork.org/ru/forum/discussion/1898/doesn-t-work-on-some-sites
-			this.lastMouseDownPos.x = e.pageX;
-			this.lastMouseDownPos.y = e.pageY;
-
-			this.uninitFlag = false;
-
-			if (e.target.nodeName == "IMG") {
-				this.imgFlag = true;
-			}
-
-			select = window.getSelection();
-			if (!select.isCollapsed) {
-				caretPos = caretPositionFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY);
-				if (!inSelect(caretPos, select)) {
-					select.collapse(caretPos.offsetNode, caretPos.offset);
-				}
-			}
-
-		} else if (e.type == "mouseup") {
-
-			this.checkMove = false;
-			this.imgFlag = false;
-
-			if (!this.target) {
-				return;
-			}
-
-			this.uninitFlag = true;
-			this.uninit();
-
-		} else if (e.type == "mousemove") {
-
-			this.moveX = e.pageX - this.currentPos.x;
-			this.moveY = e.pageY - this.currentPos.y;
-			this.currentPos.x = e.pageX;
-			this.currentPos.y = e.pageY;
-
-			if (!this.target) {
-				return;
-			}
-
-			select = window.getSelection();
-			caretPos = caretPositionFromPoint(this.currentPos.x - window.scrollX, this.currentPos.y - window.scrollY);
-			if (!this.multiSelect) {
-				select.extend(caretPos.offsetNode, caretPos.offset);
-			} else {
-				this.range.setEnd(caretPos.offsetNode, caretPos.offset);
-			}
-
-		} else if (e.type == "dragstart") {
-
-			if (e.button || e.altKey || e.shiftKey) {
-				return;
-			}
-
-			if (this.imgFlag) {
-				this.imgFlag = false;
-				return;
-			}
-
-			a = e.target;
-			while (a.nodeName != "A" && a.nodeName != "HTML") {
-				a = a.parentNode;
-			}
-
-			if (!a.href) {
-				return;
-			}
-
-			movementX = e.pageX - this.currentPos.x;
-			movementY = e.pageY - this.currentPos.y;
-
-			if (!movementX && !movementY) {
-				movementX = this.moveX;
-				movementY = this.moveY;
-			}
-			if (Math.abs(movementX) < Math.abs(movementY)) {
-				return;
-			}
-
-			e.preventDefault();
-			this.target = a;
-			this.init(e);
-		}
-	},
-	init: function(e){
-		var select = window.getSelection();
-
-		this.startPos.x = e.pageX;
-		this.startPos.y = e.pageY;
-
-		this.multiSelect = e.ctrlKey;
-
-		var caretPos = caretPositionFromPoint(this.startPos.x - window.scrollX, this.startPos.y - window.scrollY);
-		if (!this.multiSelect) {
-			select.collapse(caretPos.offsetNode, caretPos.offset);
-		} else {
-			this.range = new Range();
-			this.range.setEnd(caretPos.offsetNode, caretPos.offset);
-			this.range.collapse();
-			select.addRange(this.range);
-		}
-
-		this.target.classList.add("force-select");
-
-	},
-	uninit: function(){
-
-		this.target.classList.remove("force-select");
-		this.target = null;
-		this.range = null;
-		this.multiSelect = false;
-
-	}
-};
-
-document.addEventListener("mousemove", force, false);
-document.addEventListener("mouseup", force, false);
-document.addEventListener("mousedown", force, true);
-document.addEventListener("click", force, true);
-document.addEventListener("dragstart", force, true);
-document.addEventListener("DOMContentLoaded", function(){
-	GM_addStyle(".force-select{ -moz-user-select: text!important; }");
-}, false);
+function findLinkTarget(target) {
+  while (target && target.nodeName !== "A") {
+    target = target.parentNode;
+  }
+  return target;
+}
