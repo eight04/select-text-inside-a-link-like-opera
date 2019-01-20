@@ -1,0 +1,29 @@
+{
+  "name": "select-text-inside-a-link-like-opera",
+  "version": "4.0.12",
+  "description": "Disable link dragging and select text.",
+  "scripts": {
+    "test": "eslint **/*.js",
+    "version": "userscript-meta -u select-text-inside-a-link-like-opera.user.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eight04/select-text-inside-a-link-like-opera.git"
+  },
+  "author": "eight <eight04@gmail.com> (http://eight04.blogspot.tw)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eight04/select-text-inside-a-link-like-opera/issues"
+  },
+  "homepage": "https://github.com/eight04/select-text-inside-a-link-like-opera#readme",
+  "devDependencies": {
+    "eslint": "^5.12.1"
+  },
+  "userscript": {
+    "name": "Select text inside a link like Opera",
+    "namespace": "eight04.blogspot.com",
+    "include": ["*"],
+    "grant": ["GM_addStyle"],
+    "run-at": "document-start"
+  }
+}
