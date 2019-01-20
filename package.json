@@ -1,6 +1,6 @@
 {
   "name": "select-text-inside-a-link-like-opera",
-  "version": "4.0.12",
+  "version": "5.0.0",
   "description": "Disable link dragging and select text.",
   "scripts": {
     "test": "eslint **/*.js",
@@ -25,8 +25,12 @@
   "userscript": {
     "name": "Select text inside a link like Opera",
     "namespace": "eight04.blogspot.com",
-    "include": ["*"],
-    "grant": ["GM_addStyle"],
+    "include": [
+      "*"
+    ],
+    "grant": [
+      "GM_addStyle"
+    ],
     "run-at": "document-start"
   }
 }
