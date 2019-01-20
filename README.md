@@ -23,6 +23,11 @@ In Firefox, we can't detect the movement of the cursor *after* the mousedown eve
 Changelog
 ---------
 
+* 5.0.0 (Jan 20, 2019)
+
+  - Rewrite.
+  - Fix: don't collapse selection if the target is not a link.
+
 * 4.0.12 (Nov 18, 2014)
 
 	- Enhance: Only prevent click if text is selected.
