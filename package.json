@@ -5,7 +5,7 @@
   "scripts": {
     "test": "eslint **/*.js",
     "preversion": "npm test",
-    "version": "userscript-meta -u select-text-inside-a-link-like-opera.user.js",
+    "version": "userscript-meta -u select-text-inside-a-link-like-opera.user.js && git add .",
     "postversion": "git push"
   },
   "private": true,
