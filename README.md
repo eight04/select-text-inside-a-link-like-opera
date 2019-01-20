@@ -3,8 +3,6 @@ Select text inside a link like Opera
 
 By installing this script, you can select text inside a link without dragging them around if the cursor was moved horizontally.
 
-Support Firefox and Chrome.
-
 ![](https://i.imgur.com/f7TgRur.png)
 ![](https://i.imgur.com/NSqXG5n.png)
 
@@ -12,6 +10,13 @@ Installation
 ------------
 
 [Greasy Fork](https://greasyfork.org/en/scripts/789-select-text-inside-a-link-like-opera)
+
+Compatibility
+-------------
+
+This script supports Firefox and Chrome. However, things become tricky in Firefox.
+
+In Firefox, we can't detect the movement of the cursor *after* the mousedown event, so we actually use the movement *before* the mouse click. If you move the cursor vertically to a link, stop, then drag the link horizontally, the script will detect the movement as vertical and it won't prevent the link from being dragged.
 
 Changelog
 ---------
