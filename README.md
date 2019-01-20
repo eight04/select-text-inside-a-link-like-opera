@@ -1,6 +1,8 @@
 Select text inside a link like Opera
 ====================================
 
+[![Build Status](https://travis-ci.com/eight04/select-text-inside-a-link-like-opera.svg?branch=master)](https://travis-ci.com/eight04/select-text-inside-a-link-like-opera)
+
 By installing this script, you can select text inside a link without dragging them around if the cursor was moved horizontally.
 
 ![](https://i.imgur.com/f7TgRur.png)
