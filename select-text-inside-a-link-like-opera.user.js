@@ -20,7 +20,7 @@ document.addEventListener("mousedown", e => {
   if (e.shiftKey || e.altKey || e.button || e.ctrlKey && !IS_FIREFOX) {
     return;
   }
-  if (e.target.nodeName === "IMG") {
+  if (e.target.nodeName === "IMG" || e.target.nodeName === "img") {
     return;
   }
   const target = findLinkTarget(e.target);
@@ -150,7 +150,7 @@ function inSelect(caretPos, selection){
 }
 
 function findLinkTarget(target) {
-  while (target && target.nodeName !== "A") {
+  while (target && target.nodeName !== "A" && target.nodeName !== "a") {
     target = target.parentNode;
   }
   return target;
