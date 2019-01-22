@@ -98,9 +98,11 @@ document.addEventListener("mousedown", e => {
   }
 }, true);
 
-document.addEventListener("DOMContentLoaded", function(){
-	GM_addStyle(".select-text-inside-a-link{ -moz-user-select: text!important; }");
-});
+if (document.contentType !== "text/xml") {
+  document.addEventListener("DOMContentLoaded", function(){
+    GM_addStyle(".select-text-inside-a-link{ -moz-user-select: text!important; }");
+  });
+}
 
 function createMovementTracker() {
   // we always have to track mouse movement so we can use the delta in dragstart
