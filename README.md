@@ -23,6 +23,10 @@ In Firefox, we can't detect the movement of the cursor *after* the mousedown eve
 Changelog
 ---------
 
+* 5.0.1 (Jan 22, 2019)
+
+  - Fix: compatible with XML/XHTML pages.
+
 * 5.0.0 (Jan 20, 2019)
 
   - Rewrite.
