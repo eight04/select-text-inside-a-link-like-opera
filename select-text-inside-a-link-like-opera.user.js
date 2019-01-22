@@ -20,7 +20,7 @@ document.addEventListener("mousedown", e => {
   if (e.shiftKey || e.altKey || e.button || e.ctrlKey && !IS_FIREFOX) {
     return;
   }
-  if (e.target.nodeName === "IMG") {
+  if (e.target.nodeName === "IMG" || e.target.nodeName === "img") {
     return;
   }
   const target = findLinkTarget(e.target);
@@ -98,9 +98,11 @@ document.addEventListener("mousedown", e => {
   }
 }, true);
 
-document.addEventListener("DOMContentLoaded", function(){
-	GM_addStyle(".select-text-inside-a-link{ -moz-user-select: text!important; }");
-});
+if (!document.contentType || !document.contentType.endsWith("/xml")) {
+  document.addEventListener("DOMContentLoaded", function(){
+    GM_addStyle(".select-text-inside-a-link{ -moz-user-select: text!important; }");
+  });
+}
 
 function createMovementTracker() {
   // we always have to track mouse movement so we can use the delta in dragstart
@@ -150,7 +152,7 @@ function inSelect(caretPos, selection){
 }
 
 function findLinkTarget(target) {
-  while (target && target.nodeName !== "A") {
+  while (target && target.nodeName !== "A" && target.nodeName !== "a") {
     target = target.parentNode;
   }
   return target;
