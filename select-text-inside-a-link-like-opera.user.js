@@ -98,7 +98,7 @@ document.addEventListener("mousedown", e => {
   }
 }, true);
 
-if (document.contentType !== "text/xml") {
+if (!document.contentType || !document.contentType.endsWith("/xml")) {
   document.addEventListener("DOMContentLoaded", function(){
     GM_addStyle(".select-text-inside-a-link{ -moz-user-select: text!important; }");
   });
