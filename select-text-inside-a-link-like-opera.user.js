@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Select text inside a link like Opera
-// @version 5.0.0
+// @version 5.0.1
 // @description Disable link dragging and select text.
 // @homepageURL https://github.com/eight04/select-text-inside-a-link-like-opera#readme
 // @supportURL https://github.com/eight04/select-text-inside-a-link-like-opera/issues
