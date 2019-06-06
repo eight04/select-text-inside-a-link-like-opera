@@ -34,6 +34,7 @@ document.addEventListener("mousedown", e => {
   let selection;
   
   const events = {
+    mousedown: uninit,
     mousemove: e => {
       posX = e.pageX;
       posY = e.pageY;
