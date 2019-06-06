@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/eight04/select-text-inside-a-link-like-opera#readme",
   "devDependencies": {
-    "eslint": "^5.12.1"
+    "eslint": "^5.16.0"
   },
   "userscript": {
     "name": "Select text inside a link like Opera",

@@ -32,12 +32,20 @@ document.addEventListener("mousedown", e => {
   let posX = initX;
   let posY = initY;
   let selection;
+  let mouseMoves = 0;
   
   const events = {
+    mousedown: uninit,
     mousemove: e => {
       posX = e.pageX;
       posY = e.pageY;
 			if (!selection) {
+        mouseMoves++;
+        // dragstart may not fire all the time
+        // https://github.com/eight04/select-text-inside-a-link-like-opera/issues/9
+        if (mouseMoves >= 3) {
+          startSelectText();
+        }
 				return;
 			}
 			const caretPos = caretPositionFromPoint(
@@ -63,26 +71,9 @@ document.addEventListener("mousedown", e => {
       }
     },
     dragstart: e => {
-      const delta = movementTracker || {deltaX: posX - initX, deltaY: posY - initY};
-			if (Math.abs(delta.deltaX) < Math.abs(delta.deltaY)) {
-        uninit();
-				return;
-			}
-      selection = window.getSelection();
-      const caretPos = caretPositionFromPoint(initX - window.scrollX, initY - window.scrollY);
-      if (!selection.isCollapsed && inSelect(caretPos, selection)) {
-        uninit();
-        return;
+      if (startSelectText()) {
+        e.preventDefault();
       }
-      if (!e.ctrlKey) {
-        selection.collapse(caretPos.offsetNode, caretPos.offset);
-      } else {
-        const range = new Range;
-        range.setStart(caretPos.offsetNode, caretPos.offset);
-        selection.addRange(range);
-      }
-      target.classList.add("select-text-inside-a-link");
-			e.preventDefault();      
     }
   };
   
@@ -95,6 +86,29 @@ document.addEventListener("mousedown", e => {
     for (const key of Object.keys(events)) {
       document.removeEventListener(key, events[key], true);
     }    
+  }
+  
+  function startSelectText() {
+    const delta = movementTracker || {deltaX: posX - initX, deltaY: posY - initY};
+    if (Math.abs(delta.deltaX) < Math.abs(delta.deltaY)) {
+      uninit();
+      return false;
+    }
+    selection = window.getSelection();
+    const caretPos = caretPositionFromPoint(initX - window.scrollX, initY - window.scrollY);
+    if (!selection.isCollapsed && inSelect(caretPos, selection)) {
+      uninit();
+      return false;
+    }
+    if (!e.ctrlKey) {
+      selection.collapse(caretPos.offsetNode, caretPos.offset);
+    } else {
+      const range = new Range;
+      range.setStart(caretPos.offsetNode, caretPos.offset);
+      selection.addRange(range);
+    }
+    target.classList.add("select-text-inside-a-link");
+    return true;
   }
 }, true);
 
