@@ -5,8 +5,8 @@ Select text inside a link like Opera
 
 By installing this script, you can select text inside a link without dragging them around if the cursor was moved horizontally.
 
-![](https://i.imgur.com/f7TgRur.png)
-![](https://i.imgur.com/NSqXG5n.png)
+![screenshot](https://i.imgur.com/f7TgRur.png)
+![screenshot](https://i.imgur.com/NSqXG5n.png)
 
 Installation
 ------------
@@ -22,6 +22,10 @@ In Firefox, we can't detect the movement of the cursor *after* the mousedown eve
 
 Changelog
 ---------
+
+* 5.0.2 (Jun 6, 2019)
+
+  - Fix: handle undraggable links.
 
 * 5.0.1 (Jan 22, 2019)
 
