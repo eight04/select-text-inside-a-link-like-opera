@@ -23,6 +23,10 @@ In Firefox, we can't detect the movement of the cursor *after* the mousedown eve
 Changelog
 ---------
 
+* 5.0.4 (Dec 22, 2019)
+
+  - Fix: don't initiate multiple instances.
+
 * 5.0.3 (Jun 6, 2019)
 
   - Fix: handle undraggable links.
