@@ -14,8 +14,12 @@
 
 const IS_FIREFOX = typeof InstallTrigger !== 'undefined';
 const movementTracker = IS_FIREFOX && createMovementTracker();
+let initialized = false;
 
 document.addEventListener("mousedown", e => {
+  if (initialized) {
+    return;
+  }
   // only Firefox supports multiple range?
   if (e.shiftKey || e.altKey || e.button || e.ctrlKey && !IS_FIREFOX) {
     return;
@@ -27,6 +31,9 @@ document.addEventListener("mousedown", e => {
   if (!target || !target.href) {
     return;
   }
+  
+  initialized = true;
+  
   const initX = e.pageX;
   const initY = e.pageY;
   let posX = initX;
@@ -35,7 +42,6 @@ document.addEventListener("mousedown", e => {
   let mouseMoves = 0;
   
   const events = {
-    mousedown: uninit,
     mousemove: e => {
       posX = e.pageX;
       posY = e.pageY;
@@ -85,7 +91,8 @@ document.addEventListener("mousedown", e => {
     target.classList.remove("select-text-inside-a-link");
     for (const key of Object.keys(events)) {
       document.removeEventListener(key, events[key], true);
-    }    
+    }
+    initialized = false;
   }
   
   function startSelectText() {
