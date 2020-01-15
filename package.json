@@ -6,7 +6,7 @@
     "test": "eslint **/*.js",
     "preversion": "npm test",
     "version": "userscript-meta -u select-text-inside-a-link-like-opera.user.js && git add .",
-    "postversion": "git push"
+    "postversion": "git push --follow-tags"
   },
   "private": true,
   "repository": {
