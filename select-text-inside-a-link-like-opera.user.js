@@ -12,112 +12,99 @@
 // @run-at document-start
 // ==/UserScript==
 
-const IS_FIREFOX = typeof InstallTrigger !== 'undefined';
-const movementTracker = IS_FIREFOX && createMovementTracker();
-let initialized = false;
+// const IS_FIREFOX = typeof InstallTrigger !== 'undefined';
+// const tracker = IS_FIREFOX && createMovementTracker();
+const tracker = createMovementTracker();
+const selection = window.getSelection();
+// waiting -> starting -> started -> ending -> waiting
+let state = "WAITING";
+let preState;
+let mousemoves = 0;
+let linkTarget;
+const initPos = [0, 0];
+let selectType;
 
-document.addEventListener("mousedown", e => {
-  if (initialized) {
-    return;
-  }
-  // only Firefox supports multiple range?
-  if (e.shiftKey || e.altKey || e.button || e.ctrlKey && !IS_FIREFOX) {
-    return;
-  }
-  if (e.target.nodeName === "IMG" || e.target.nodeName === "img") {
-    return;
-  }
-  const target = findLinkTarget(e.target);
-  if (!target || !target.href) {
-    return;
-  }
-  
-  initialized = true;
-  
-  const initX = e.pageX;
-  const initY = e.pageY;
-  let posX = initX;
-  let posY = initY;
-  let selection;
-  let mouseMoves = 0;
-  
-  const events = {
-    mousemove: e => {
-      posX = e.pageX;
-      posY = e.pageY;
-			if (!selection) {
-        mouseMoves++;
-        // dragstart may not fire all the time
-        // https://github.com/eight04/select-text-inside-a-link-like-opera/issues/9
-        if (mouseMoves >= 3) {
-          startSelectText();
-        }
-				return;
-			}
-			const caretPos = caretPositionFromPoint(
-        posX - window.scrollX,
-        posY - window.scrollY
-      );
-      selection.extend(caretPos.offsetNode, caretPos.offset);
-    },
-    mouseup: () => {
-      // delay uninit to cancel click event
-      setTimeout(uninit);
-    },
-    click: e => {
-			if (!selection) {
+const EVENTS = {
+  mousedown: e => {
+    if (state === "WAITING") {
+      if (e.altKey || e.button) {
         return;
       }
-			// fix browser clicking issue. Cancel click event if we have selected
-      // something.
-      const clickedTarget = findLinkTarget(e.target);
-      if (clickedTarget === target) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+      if (/img/i.test(e.target.nodeName)) {
+        return;
       }
-    },
-    dragstart: e => {
-      if (startSelectText()) {
-        e.preventDefault();
+      const target = findLinkTarget(e.target);
+      if (!target || !target.href) {
+        return;
+      }
+      selectType = e.ctrlKey ? "add" :
+        e.shiftKey ? "extend" : "new";
+      initPos[0] = e.pageX;
+      initPos[1] = e.pageY;
+      if (selectType === "new") {
+        if (!selection.isCollapsed && inSelect(getInitPos(), selection)) {
+          return;
+        }
+      }
+      mousemoves = 0;
+      state = "STARTING";
+      linkTarget = target;
+      linkTarget.classList.add("select-text-inside-a-link");
+    }
+  },
+  mousemove: e => {
+    if (state === "STARTING") {
+      mousemoves++;
+      // dragstart event may not fire all the time
+      // https://github.com/eight04/select-text-inside-a-link-like-opera/issues/9
+      if (mousemoves >= 3) {
+        startSelecting(e);
       }
     }
-  };
-  
-  for (const key of Object.keys(events)) {
-    document.addEventListener(key, events[key], true);
+    if (state === "STARTED") {
+      const caretPos = caretPositionFromPoint(
+        e.pageX - window.scrollX,
+        e.pageY - window.scrollY
+      );
+      selection.extend(caretPos.offsetNode, caretPos.offset);
+    }
+  },
+  mouseup: () => {
+    if (state !== "WAITING") {
+      preState = state;
+      state = "ENDING";
+      // delay uninit to cancel click event
+      setTimeout(startWaiting);
+    }
+  },
+  click: e => {
+    if (state === "ENDING") {
+      if (preState === "STARTED") {
+        // fix browser clicking issue. Cancel click event if we have selected
+        // something.
+        const clickedTarget = findLinkTarget(e.target);
+        if (clickedTarget === linkTarget) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      }
+      startWaiting();
+    }
+  },
+  dragstart: e => {
+    if (state === "STARTED") {
+      e.preventDefault();
+      return;
+    }
+    if (state === "STARTING") {
+      startSelecting(e);
+    }
   }
-  
-  function uninit() {
-    target.classList.remove("select-text-inside-a-link");
-    for (const key of Object.keys(events)) {
-      document.removeEventListener(key, events[key], true);
-    }
-    initialized = false;
-  }
-  
-  function startSelectText() {
-    const delta = movementTracker || {deltaX: posX - initX, deltaY: posY - initY};
-    if (Math.abs(delta.deltaX) < Math.abs(delta.deltaY)) {
-      uninit();
-      return false;
-    }
-    selection = window.getSelection();
-    const caretPos = caretPositionFromPoint(initX - window.scrollX, initY - window.scrollY);
-    if (!selection.isCollapsed && inSelect(caretPos, selection)) {
-      uninit();
-      return false;
-    }
-    if (!e.ctrlKey) {
-      selection.collapse(caretPos.offsetNode, caretPos.offset);
-    } else {
-      const range = new Range;
-      range.setStart(caretPos.offsetNode, caretPos.offset);
-      selection.addRange(range);
-    }
-    target.classList.add("select-text-inside-a-link");
-    return true;
-  }
-}, true);
+};
+
+for (const key in EVENTS) {
+  document.addEventListener(key, EVENTS[key], true);
+}
 
 if (!document.contentType || !document.contentType.endsWith("/xml")) {
   document.addEventListener("DOMContentLoaded", function(){
@@ -125,29 +112,67 @@ if (!document.contentType || !document.contentType.endsWith("/xml")) {
   });
 }
 
+function startSelecting(e) {
+  if (!shouldStart(e)) {
+    startWaiting();
+    return;
+  }
+  if (e.type === "dragstart") {
+    e.preventDefault();
+  }
+  if (selectType === "new") {
+    const pos = getInitPos();
+    selection.collapse(pos.offsetNode, pos.offset);
+  } else if (selectType === "add") {
+    const range = new Range;
+    const pos = getInitPos();
+    range.setStart(pos.offsetNode, pos.offset);
+    selection.addRange(range);
+  }
+  state = "STARTED";
+}
+
+function getInitPos() {
+  return caretPositionFromPoint(initPos[0] - window.scrollX, initPos[1] - window.scrollY);
+}
+
+function shouldStart(e) {
+  const delta = tracker ? tracker() :
+    [Math.abs(e.pageX - initPos[0]), Math.abs(e.pageY - initPos[1])];
+  return delta[0] >= delta[1];
+}
+
+function startWaiting() {
+  if (linkTarget) {
+    linkTarget.classList.remove("select-text-inside-a-link");
+  }
+  state = "WAITING";
+  linkTarget = null;
+}
+
 function createMovementTracker() {
-  // we always have to track mouse movement so we can use the delta in dragstart
+  // we always have to track mouse movement so we can use the delta on dragstart
   // event.
   // it is possible to calculate the movement between mousedown and dragstart
-  // events in Chrome. In Firefox, the two events are fired in the same time.
-  const tracker = {
-    posX: 0,
-    posY: 0,
-    deltaX: 0,
-    deltaY: 0
-  };
-  document.addEventListener("mousemove", onMouseMove);
-  return tracker;
-  
-  function onMouseMove(e) {
-    if (Math.abs(e.pageX - tracker.posX) < 5 && Math.abs(e.pageY - tracker.posY) < 5) {
-      return;
+  // events in Chrome. In Firefox, the two events are fired at the same time.
+  const moves = [[0, 0], [0, 0], [0, 0]];
+  let index = 0;
+  document.addEventListener("mousemove", e => {
+    moves[index][0] = e.pageX;
+    moves[index][1] = e.pageY;
+    index = (index + 1) % 3;
+  });
+  return () => {
+    const output = [];
+    for (let i = 0; i < 2; i++) {
+      // FIXME: should we assume that the array contains initial values [0, 0]?
+      output.push(
+        Math.abs(moves[index][i] - moves[(index + 1) % 3][i]) +
+        Math.abs(moves[(index + 1) % 3][i] - moves[(index + 2) % 3][i])
+      );
     }
-    tracker.deltaX = e.pageX - tracker.posX;
-    tracker.deltaY = e.pageY - tracker.posY;
-    tracker.posX = e.pageX;
-    tracker.posY = e.pageY;
-  }
+    return output;
+  };
 }
 
 function caretPositionFromPoint(x, y) {
