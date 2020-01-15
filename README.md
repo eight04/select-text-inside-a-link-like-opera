@@ -23,6 +23,11 @@ In Firefox, we can't detect the movement of the cursor *after* the mousedown eve
 Changelog
 ---------
 
+* 6.0.0 (Jan 15, 2019)
+
+  - Refactor.
+  - Breaking: add a better movement tracker and always use it.
+
 * 5.0.4 (Dec 22, 2019)
 
   - Fix: don't initiate multiple instances.
