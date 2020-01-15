@@ -1,6 +1,6 @@
 {
   "name": "select-text-inside-a-link-like-opera",
-  "version": "5.0.4",
+  "version": "6.0.0",
   "description": "Disable link dragging and select text.",
   "scripts": {
     "test": "eslint **/*.js",
